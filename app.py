@@ -24,19 +24,16 @@ with col1:
 with col2:
     user_segment = st.selectbox("User Segment", ['New', 'Active', 'Inactive'])
     day = st.selectbox("Day of the Week", ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'])
-
+    
 if st.button("Predict Open Rate"):
     input_df = pd.DataFrame([[category, urgency, user_segment, day]],
                             columns=["category", "urgency", "user_segment", "day"])
-    
-    # Apply one-hot encoding
+
     encoded_input = ohe.transform(input_df)
     if hasattr(encoded_input, "toarray"):
         encoded_input = encoded_input.toarray()
-    
-    # Predict
+
     prediction = model.predict(encoded_input)
-    
     st.success(f"📬 Predicted Open Rate: {prediction[0]*100:.2f}%")
 
 
