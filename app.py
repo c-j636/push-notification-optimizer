@@ -28,8 +28,16 @@ with col2:
 if st.button("Predict Open Rate"):
     input_df = pd.DataFrame([[category, urgency, user_segment, day]],
                             columns=["category", "urgency", "user_segment", "day"])
-    encoded_input = ohe.transform(input_df).toarray()
+    
+    # Apply one-hot encoding
+    encoded_input = ohe.transform(input_df)
+    if hasattr(encoded_input, "toarray"):
+        encoded_input = encoded_input.toarray()
+    
+    # Predict
     prediction = model.predict(encoded_input)
+    
     st.success(f"📬 Predicted Open Rate: {prediction[0]*100:.2f}%")
+
 
 
