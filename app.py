@@ -3,10 +3,11 @@ import pickle
 import pandas as pd
 
 # Load the model and encoder
+
 @st.cache_resource
 def load_model():
-    model = pickle.load(open("notebooks/best_lightgbm_model.pkl", "rb"))
-    ohe = pickle.load(open("notebooks/ohe.pkl", "rb"))
+    model = pickle.load(open("best_lightgbm_model.pkl", "rb"))
+    ohe = pickle.load(open("ohe.pkl", "rb"))
     return model, ohe
 
 model, ohe = load_model()
