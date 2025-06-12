@@ -4,13 +4,15 @@ import pandas as pd
 
 # Load the model and encoder
 
+import os
+
 @st.cache_resource
 def load_model():
-    model = pickle.load(open("best_lightgbm_model.pkl", "rb"))
-    ohe = pickle.load(open("ohe.pkl", "rb"))
+    model_path = os.path.join("notebooks", "best_lightgbm_model.pkl")
+    ohe_path = os.path.join("notebooks", "ohe.pkl")
+    model = pickle.load(open(model_path, "rb"))
+    ohe = pickle.load(open(ohe_path, "rb"))
     return model, ohe
-
-model, ohe = load_model()
 
 # Streamlit UI
 st.title("Push Notification Optimizer")
