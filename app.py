@@ -12,7 +12,6 @@ def load_model():
     ohe = pickle.load(open(ohe_path, "rb"))
     return model, ohe
 
-# Make sure it's loaded before the UI code
 model, ohe = load_model()
 
 # Streamlit UI
@@ -34,10 +33,11 @@ if st.button("Predict Open Rate"):
     input_df = pd.DataFrame([[category, urgency, user_segment, day]],
                             columns=["category", "urgency", "user_segment", "day"])
     
-    try:
-        encoded_input = ohe.transform(input_df).toarray()
-        prediction = model.predict(encoded_input)
-        st.success(f"📬 Predicted Open Rate: {prediction[0]*100:.2f}%")
-    except Exception as e:
-        st.error(f"⚠️ Error during prediction: {e}")
+    # Apply one-hot encoding
+    encoded_input = ohe.transform(input_df).toarray()
+    
+    # Predict
+    prediction = model.predict(encoded_input)
+    
+    st.success(f"📬 Predicted Open Rate: {prediction[0]*100:.2f}%")
 
