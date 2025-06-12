@@ -6,11 +6,12 @@ import os
 
 @st.cache_resource
 def load_model():
-    model_path = os.path.join("notebooks", "best_lightgbm_model.pkl")
-    ohe_path = os.path.join("notebooks", "ohe.pkl")
-    model = pickle.load(open(model_path, "rb"))
-    ohe = pickle.load(open(ohe_path, "rb"))
+    with open("best_lightgbm_model.pkl", "rb") as model_file:
+        model = pickle.load(model_file)
+    with open("ohe.pkl", "rb") as ohe_file:
+        ohe = pickle.load(ohe_file)
     return model, ohe
+
 
 model, ohe = load_model()
 
