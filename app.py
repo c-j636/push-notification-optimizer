@@ -8,11 +8,9 @@ def load_model():
     ohe = joblib.load("ohe.pkl")
     return model, ohe
 
-# Load the model and encoder
 model, ohe = load_model()
 
-# Streamlit UI
-st.title("Push Notification Optimizer")
+st.title("📬 Push Notification Optimizer")
 st.markdown("### Enter notification features to predict the open rate")
 
 col1, col2 = st.columns(2)
@@ -24,17 +22,31 @@ with col1:
 with col2:
     user_segment = st.selectbox("User Segment", ['New', 'Active', 'Inactive'])
     day = st.selectbox("Day of the Week", ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'])
-    
+
 if st.button("Predict Open Rate"):
-    input_df = pd.DataFrame([[category, urgency, user_segment, day]],
-                            columns=["category", "urgency", "user_segment", "day"])
+    input_df = pd.DataFrame({
+        "category": [category],
+        "urgency": [urgency],
+        "user_segment": [user_segment],
+        "day": [day]
+    })
 
-    encoded_input = ohe.transform(input_df)
-    if hasattr(encoded_input, "toarray"):
-        encoded_input = encoded_input.toarray()
+    try:
+        # Safely transform the input
+        encoded_input = ohe.transform(input_df)
 
-    prediction = model.predict(encoded_input)
-    st.success(f"📬 Predicted Open Rate: {prediction[0]*100:.2f}%")
+        # Convert to array if needed
+        if hasattr(encoded_input, "toarray"):
+            encoded_input = encoded_input.toarray()
+
+        prediction = model.predict(encoded_input)
+        st.success(f"📈 Predicted Open Rate: {prediction[0]*100:.2f}%")
+
+    except Exception as e:
+        st.error("❌ Prediction Failed")
+        st.code(str(e))
+        st.write("Debug input:")
+        st.dataframe(input_df)
 
 
 
