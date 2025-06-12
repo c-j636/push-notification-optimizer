@@ -1,29 +1,40 @@
 import streamlit as st
-import pandas as pd
 import pickle
+import pandas as pd
 
-# Load your model and encoder
+# Load the model and encoder
 @st.cache_resource
 def load_model():
-    model = pickle.load(open("best_lightgbm_model.pkl", "rb"))
-    ohe = pickle.load(open("ohe.pkl", "rb"))
+    model = pickle.load(open("notebooks/best_lightgbm_model.pkl", "rb"))
+    ohe = pickle.load(open("notebooks/ohe.pkl", "rb"))
     return model, ohe
 
 model, ohe = load_model()
 
-# UI
-st.title("📲 Push Notification Optimizer")
-st.write("Fill in the details below to get the best time and audience for push notifications!")
+# Streamlit UI
+st.title("Push Notification Optimizer")
 
-# Example Inputs (Replace with your real features)
-platform = st.selectbox("Platform", ["Android", "iOS"])
-segment = st.selectbox("User Segment", ["New", "Returning"])
-hour = st.slider("Hour of Day", 0, 23)
+st.markdown("### Enter notification features to predict the open rate")
 
-# Make prediction
-if st.button("Predict Engagement Score"):
-    input_df = pd.DataFrame([[platform, segment, hour]], columns=["platform", "segment", "hour"])
-    input_encoded = ohe.transform(input_df)
-    prediction = model.predict(input_encoded)
-    st.success(f"📈 Predicted Engagement Score: {prediction[0]:.2f}")
+col1, col2 = st.columns(2)
+
+with col1:
+    category = st.selectbox("Category", ['General', 'Discount', 'Urgent', 'New Launch'])
+    urgency = st.selectbox("Urgency Level", ['Low', 'Medium', 'High'])
+
+with col2:
+    user_segment = st.selectbox("User Segment", ['New', 'Active', 'Inactive'])
+    day = st.selectbox("Day of the Week", ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'])
+
+if st.button("Predict Open Rate"):
+    input_df = pd.DataFrame([[category, urgency, user_segment, day]],
+                            columns=["category", "urgency", "user_segment", "day"])
+    
+    # Apply one-hot encoding
+    encoded_input = ohe.transform(input_df).toarray()
+    
+    # Predict
+    prediction = model.predict(encoded_input)
+    
+    st.success(f"📬 Predicted Open Rate: {prediction[0]*100:.2f}%")
 
