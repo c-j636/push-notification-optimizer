@@ -1,23 +1,18 @@
 import streamlit as st
-import pickle
 import pandas as pd
-
-import os
+import joblib
 
 @st.cache_resource
 def load_model():
-    with open("best_lightgbm_model.pkl", "rb") as model_file:
-        model = pickle.load(model_file)
-    with open("ohe.pkl", "rb") as ohe_file:
-        ohe = pickle.load(ohe_file)
+    model = joblib.load("best_lightgbm_model.pkl")
+    ohe = joblib.load("ohe.pkl")
     return model, ohe
 
-
+# Load the model and encoder
 model, ohe = load_model()
 
 # Streamlit UI
 st.title("Push Notification Optimizer")
-
 st.markdown("### Enter notification features to predict the open rate")
 
 col1, col2 = st.columns(2)
@@ -33,12 +28,8 @@ with col2:
 if st.button("Predict Open Rate"):
     input_df = pd.DataFrame([[category, urgency, user_segment, day]],
                             columns=["category", "urgency", "user_segment", "day"])
-    
-    # Apply one-hot encoding
     encoded_input = ohe.transform(input_df).toarray()
-    
-    # Predict
     prediction = model.predict(encoded_input)
-    
     st.success(f"📬 Predicted Open Rate: {prediction[0]*100:.2f}%")
+
 
